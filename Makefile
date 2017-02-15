@@ -35,6 +35,11 @@ CFLAGS += -Iinclude
 LDFLAGS += -flto -Os -pie
 LIBS += -lpthread
 
+ifdef USE_SANITIZERS
+CFLAGS += -fsanitize=cfi -fsanitize=safe-stack -flto -fvisibility=hidden
+LDFLAGS += -fsanitize=cfi -fsanitize=safe-stack -fvisibility=hidden
+endif
+
 obj-y += source/args.o
 obj-y += source/buffer.o
 obj-y += source/cache.o
@@ -76,12 +81,12 @@ all: $(BUILD)/anc $(BUILD)/revanc
 $(BUILD)/anc: $(obj) $(anc-obj) $(BUILD)/var/LDFLAGS $(BUILD)/var/LIBS
 	@echo "LD $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(obj) $(anc-obj) -o $@ $(LDFLAGS) $(LIBS)
+	$(CC) $(obj) $(anc-obj) -o $@ $(LDFLAGS) $(LIBS)
 
 $(BUILD)/revanc: $(obj) $(revanc-obj) $(BUILD)/var/LDFLAGS $(BUILD)/var/LIBS
 	@echo "LD $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(obj) $(revanc-obj) -o $@ $(LDFLAGS) $(LIBS)
+	$(CC) $(obj) $(revanc-obj) -o $@ $(LDFLAGS) $(LIBS)
 
 # Rule used to detect changed variables.
 $(BUILD)/var/%: force
@@ -92,13 +97,13 @@ $(BUILD)/var/%: force
 $(BUILD)/%.o: %.c $(BUILD)/var/CFLAGS $(config-header)
 	@echo "CC $<"
 	@mkdir -p $(dir $@)
-	@$(CC) -c $< -o $@ $(CFLAGS) -MT $@ -MMD -MP -MF $(@:.o=.d)
+	$(CC) -c $< -o $@ $(CFLAGS) -MT $@ -MMD -MP -MF $(@:.o=.d)
 
 # Rule to compile Assembly source code.
 $(BUILD)/%.o: %.S $(BUILD)/var/CFLAGS $(config-header)
 	@echo "AS $<"
 	@mkdir -p $(dir $@)
-	@$(CC) -c $< -o $@ $(CFLAGS) -MT $@ -MMD -MP -MF $(@:.o=.d)
+	$(CC) -c $< -o $@ $(CFLAGS) -MT $@ -MMD -MP -MF $(@:.o=.d)
 
 # Rule to generate a header containing the definitions from the config file.
 $(BUILD)/include/config.h: $(CONFIG)

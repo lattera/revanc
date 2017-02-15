@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define	MAP_NORESERVE	0
+
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 

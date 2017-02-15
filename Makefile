@@ -14,11 +14,15 @@ ARCH ?= $(shell uname -m | \
 	sed 's/\(x86_64\)/x86-64/gi')
 
 # Check ARCH against a whitelist.
-ARCH := $(filter arm arm64 x86 x86-64,$(ARCH))
+ARCH := $(filter arm arm64 x86 x86-64 amd64,$(ARCH))
 
 # If ARCH is still unset, then the architecture is not (yet) supported.
 ifeq ($(ARCH),)
 $(error No support available for the target architecture)
+endif
+
+ifeq ($(ARCH),amd64)
+ARCH=x86-64
 endif
 
 # Include the config file.
@@ -26,9 +30,9 @@ CONFIG ?= scripts/config
 include $(CONFIG)
 
 # Basic settings.
-CFLAGS += -D_GNU_SOURCE -g3 -Wall -Wextra -std=gnu11 -Os
+CFLAGS += -D_GNU_SOURCE -g3 -Wall -Wextra -std=gnu11 -Os -fPIC -fPIE -pie
 CFLAGS += -Iinclude
-LDFLAGS += -flto -Os
+LDFLAGS += -flto -Os -pie
 LIBS += -lpthread
 
 obj-y += source/args.o

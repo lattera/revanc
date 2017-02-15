@@ -7,9 +7,13 @@
 
 #include <pthread.h>
 
+#include <sys/types.h>
+#include <sys/_cpuset.h>
+#include <sys/cpuset.h>
+
 int pin_cpu(size_t i)
 {
-	cpu_set_t cpu_set;
+	cpuset_t cpu_set;
 	pthread_t thread;
 
 	thread = pthread_self();
